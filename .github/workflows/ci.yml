@@ -39,8 +39,14 @@ jobs:
 
       - name: Check the API and DB are not exposed
         run: |
-          ! curl -s -m 3 localhost:5000
-          ! curl -s -m 3 localhost:5432
+          for port in 5000 5432; do
+            if curl -s -m 3 localhost:$port > /dev/null 2>&1; then
+              echo "Port $port is exposed"
+              exit 1
+            fi
+          done
+          echo "Only nginx is exposed"
+
       - name: Build the API image for scanning
         run: docker build -t three-tier-api:ci ./api
 
@@ -51,6 +57,7 @@ jobs:
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: "0"
+
       - name: Show logs on failure
         if: failure()
         run: docker compose logs
