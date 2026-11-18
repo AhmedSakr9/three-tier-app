@@ -65,6 +65,7 @@ jobs:
       - name: Tear down
         if: always()
         run: docker compose down -v
+
   publish:
     needs: build-and-test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -82,6 +83,8 @@ jobs:
       - name: Build and push the API image
         run: |
           IMAGE=ghcr.io/ahmedsakr9/three-tier-api
-          docker build -t $IMAGE:latest -t $IMAGE:${{ github.sha }} ./api
+          docker build \
+            --label org.opencontainers.image.source=https://github.com/AhmedSakr9/three-tier-app \
+            -t $IMAGE:latest -t $IMAGE:${{ github.sha }} ./api
           docker push $IMAGE:latest
           docker push $IMAGE:${{ github.sha }}
