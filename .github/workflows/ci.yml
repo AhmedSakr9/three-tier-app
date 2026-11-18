@@ -41,7 +41,16 @@ jobs:
         run: |
           ! curl -s -m 3 localhost:5000
           ! curl -s -m 3 localhost:5432
+      - name: Build the API image for scanning
+        run: docker build -t three-tier-api:ci ./api
 
+      - name: Scan the API image with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: three-tier-api:ci
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "0"
       - name: Show logs on failure
         if: failure()
         run: docker compose logs
