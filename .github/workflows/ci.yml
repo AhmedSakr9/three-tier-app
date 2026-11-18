@@ -65,3 +65,23 @@ jobs:
       - name: Tear down
         if: always()
         run: docker compose down -v
+  publish:
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build and push the API image
+        run: |
+          IMAGE=ghcr.io/ahmedsakr9/three-tier-api
+          docker build -t $IMAGE:latest -t $IMAGE:${{ github.sha }} ./api
+          docker push $IMAGE:latest
+          docker push $IMAGE:${{ github.sha }}
