@@ -52,5 +52,5 @@ reads a note end to end, and checks that the API and database ports are not expo
 
 ## Roadmap
 
-- [ ] Vulnerability scan with Trivy in CI
-- [ ] Push the image to GitHub Container Registry
+- [x] Vulnerability scan with Trivy in CI
+- [x] Push the image to GitHub Container Registry
